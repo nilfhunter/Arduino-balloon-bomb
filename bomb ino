@@ -1,0 +1,69 @@
+#include <LiquidCrystal.h>
+#include <Servo.h> 
+
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int buzzerPin = 8; 
+const int servoPin = 9;
+const int ledPin = 7; 
+
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+Servo myservo; 
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT); 
+  myservo.attach(servoPin); 
+}
+
+void loop() {
+  for (int count = 10; count >= 0; count--) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Countdown: ");
+    lcd.print(count);
+
+    if (count > 0) {
+      // Adjust beep interval 
+      int beepInterval = map(count, 10, 1, 500, 50); 
+
+      // Adjust beep frequency 
+      int beepFrequency = map(count, 10, 1, 1000, 5000); 
+
+      tone(buzzerPin, beepFrequency); 
+      digitalWrite(ledPin, HIGH); 
+      delay(beepInterval); 
+      noTone(buzzerPin); 
+      digitalWrite(ledPin, LOW); 
+      delay(beepInterval); 
+    }
+
+    delay(1000); 
+  }
+
+  // Very fast beeps at the end
+  unsigned long startTime = millis();
+  while (millis() - startTime < 5000) { 
+    tone(buzzerPin, 5000); 
+    digitalWrite(ledPin, HIGH); 
+    delay(20); 
+    noTone(buzzerPin); 
+    digitalWrite(ledPin, LOW); 
+    delay(20); 
+  }
+
+  // Move servo back and forth rapidly for 1 minute
+  startTime = millis(); // Reset startTime for servo movement
+  while (millis() - startTime < 60000) { 
+    for (int pos = 0; pos <= 180; pos++) { 
+      myservo.write(pos);
+      delay(1); 
+    }
+    for (int pos = 180; pos >= 0; pos--) { 
+      myservo.write(pos);
+      delay(1); 
+    }
+  }
+
+  delay(2000); 
+}
